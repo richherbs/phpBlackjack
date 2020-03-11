@@ -1,16 +1,5 @@
 <?php
 
-//function shufflePack (array $aDeck) : array {
-//    //for each suit in a deck
-//    foreach($aDeck as $aSuit => $suitCards){
-//        //randomise the cards in a suit
-////        shuffle($suitCards);
-//        $aDeck[$aSuit] = $suitCards;
-//    }
-//
-//    return $aDeck;
-//}
-
 function dealCard(array &$aDeck) {
     //pick a random suit
     $aSuit = array_rand($aDeck);
