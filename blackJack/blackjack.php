@@ -23,7 +23,7 @@ function dealCard(array &$aDeck) {
 function totalHand (array $aPlayer) : int {
     $aPlayersTotalScore = 0;
     //get value of all cards in hand
-    foreach ($aPlayer as $cardInHand) {
+    foreach ($aPlayer['cards'] as $cardInHand) {
         if(is_int($cardInHand[1])){
             $aPlayersTotalScore += $cardInHand[1];
         } elseif ($cardInHand[1] == 'Ace') {
