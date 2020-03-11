@@ -60,7 +60,33 @@ function makeWinningMessage (array $aPlayer) : string {
     return $winningMessage;
 }
 
-function andTheWinnerIs(array $aPlayer, array $anotherPlayer) : string {
+function aceInHand($aPlayer){
+    $playersHand = $aPlayer['cards'];
+    $aceInHand = false;
+    foreach ($playersHand as $cardInHand){
+        if($cardInHand['name'] == 'Ace' and count($playersHand) <= 2){
+            $aceInHand = true;
+        }
+
+    }
+    return $aceInHand;
+}
+
+function royalInHand ($aPlayer){
+    $playersHand = $aPlayer['cards'];
+    $royalInHand = false;
+    foreach ($playersHand as $cardInHand){
+        if($cardInHand['name'] == 'King' or $cardInHand['name'] == 'Queen' or $cardInHand['name'] == 'Jack') $royalInHand = true;
+    }
+
+    return $royalInHand;
+}
+
+function andTheWinnerIs(array $aPlayer, array $anotherPlayer) : string
+{
+    $playerScore = $aPlayer['score'];
+    $houseScore = $anotherPlayer['score'];
+
     $winningMessage = 'Player 1 Has: <br>';
 
     $winningMessage = $winningMessage . makeWinningMessage($aPlayer);
@@ -71,18 +97,24 @@ function andTheWinnerIs(array $aPlayer, array $anotherPlayer) : string {
 
     $winningMessage = $winningMessage . '<br><br>';
 
-    if ($aPlayer['score'] > $anotherPlayer['score'] and $aPlayer['score'] <= 21) {
-        $winningMessage = $winningMessage . 'PLAYER WINS!!!!!';
-    } elseif ($aPlayer['score'] < $anotherPlayer['score'] and $anotherPlayer['score'] <= 21) {
-        $winningMessage = $winningMessage . "Sorry the house wins :-(";
-    } elseif ($aPlayer['score'] == $anotherPlayer['score']) {
-        $winningMessage = $winningMessage . 'It\' a draw...';
-    } elseif ($aPlayer > 21){
-        $winningMessage = $winningMessage . 'Sorry house wins. Player is bust.';
-    } elseif ($anotherPlayer > 21){
-        $winningMessage = $winningMessage . 'Player wins! House is bust.';
+    if($playerScore > 21 and $houseScore > 21){
+        $winningMessage .= 'Both bust...';
+    } elseif ($houseScore > 21){
+        $winningMessage .= 'Player Wins!!!!';
+    } elseif ($playerScore > 21){
+        $winningMessage .= 'House wins :-(';
+    } elseif (aceInHand($aPlayer) and royalInHand($aPlayer) and aceInHand($anotherPlayer) and royalInHand($anotherPlayer)){
+        $winningMessage .= 'Both got BLACKJACK WOOOOAHHHH!!!';
+    } elseif (aceInHand($aPlayer) and royalInHand($aPlayer)){
+        $winningMessage .= 'Player got BLACKJACK!!! Player wins!!!!!';
+    } elseif (aceInHand($anotherPlayer) and royalInHand($anotherPlayer)){
+        $winningMessage .= 'House got BLACKJACK! House wins!!!! :-(';
+    } elseif ($playerScore == $houseScore){
+        $winningMessage .= "It\'s a draw";
+    } elseif ($playerScore > $houseScore){
+        $winningMessage .= 'Player wins!!!!! Well done.';
     } else {
-        $winningMessage = $winningMessage . 'Unlucky both bust.';
+        $winningMessage .= 'Sadly the house wins :-(';
     }
 
     return $winningMessage;
@@ -96,9 +128,9 @@ function playBlackjack () {
         'spades' => [2 => 2, 3 => 3, 4 => 4, 5 =>5, 6 =>6, 7 => 7, 8 => 8, 9 => 9, 10 => 10,'Jack' => 10 ,'Queen' => 10,'King' =>10,'Ace' =>11],
     ];
 
-    $player = [];
+    $player = ['name' => 'Player'];
 
-    $house = [];
+    $house = ['name' => 'The House'];
 
     while(true) {
         //deal card -> player
@@ -108,11 +140,6 @@ function playBlackjack () {
         //total player hand
         $player['score'] = totalHand($player);
 
-        //check if player busts
-        if(checkBust($player)){
-            echo andTheWinnerIs($player, $house);
-            break;
-        }
         //deal card -> house
         $house['cards'][] = dealCard($deck);
         //deal card -> house
@@ -120,11 +147,6 @@ function playBlackjack () {
         //total hand -> house
         $house['score'] = totalHand($house);
 
-        //check if bust -> house
-        if (checkBust($house)){
-            echo andTheWinnerIs($player ,$house);
-            break;
-        }
         while($player['score'] <= 16 and $house['score'] <= 16){
             $player['cards'][] = dealCard($deck);
             $house['cards'][] = dealCard($deck);
