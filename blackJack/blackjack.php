@@ -28,8 +28,8 @@ function totalHand (array $aPlayer) : int {
     return $aPlayersTotalScore;
 }
 
-function checkBust(array $aPlayer) : bool {
-    return $aPlayer['score'] > 21;
+function shouldIKeepPlaying(array $aPlayer) : bool {
+    return $aPlayer['score'] <= 16;
 }
 
 function makeWinningMessage (array $aPlayer) : string {
@@ -71,21 +71,21 @@ function royalInHand ($aPlayer){
     return $royalInHand;
 }
 
-function andTheWinnerIs(array $aPlayer, array $anotherPlayer) : string
+function andTheWinnerIs(array $somePlayers) : string
 {
-    $playerScore = $aPlayer['score'];
-    $houseScore = $anotherPlayer['score'];
+    $winningMessage = '';
 
-    $winningMessage = 'Player 1 Has: <br>';
+    foreach ($somePlayers as $eachPlayer){
+        $playerScore = $eachPlayer['score'];
+        $playerName = $eachPlayer['name'];
+        $lineBreak = '<br>'
 
-    $winningMessage = $winningMessage . makeWinningMessage($aPlayer);
+        $winningMessage .= "$playerName has: $lineBreak";
+        $winningMessage .= makeWinningMessage($eachPlayer);
+        $winningMessage .= $lineBreak . $lineBreak;
+    }
 
-    $winningMessage = $winningMessage . '<br> <br>The House has: <br>';
-
-    $winningMessage = $winningMessage . makeWinningMessage($anotherPlayer);
-
-    $winningMessage = $winningMessage . '<br><br>';
-
+    //create logic for game win states with up to 7 players...
     if($playerScore > 21 and $houseScore > 21){
         $winningMessage .= 'Both bust...';
     } elseif ($houseScore > 21){
@@ -117,32 +117,33 @@ function playBlackjack () {
         'spades' => [2 => 2, 3 => 3, 4 => 4, 5 =>5, 6 =>6, 7 => 7, 8 => 8, 9 => 9, 10 => 10,'Jack' => 10 ,'Queen' => 10,'King' =>10,'Ace' =>11],
     ];
 
-    $player = ['name' => 'Player'];
+    $players = ['player 1' =>['keepPlaying' => true, 'name' => 'Player 1'],
+        'player 2' => ['keepPlaying' => true, 'name' => 'player 2'],
+        'house' => ['keepPlaying' => true, 'name' => 'house'] ];
 
-    $house = ['name' => 'The House'];
 
     while(true) {
-        //deal card -> player
-        $player['cards'][] = dealCard($deck);
-        //deal card -> player
-        $player['cards'][]= dealCard($deck);
-        //total player hand
-        $player['score'] = totalHand($player);
 
-        //deal card -> house
-        $house['cards'][] = dealCard($deck);
-        //deal card -> house
-        $house['cards'][] = dealCard($deck);
-        //total hand -> house
-        $house['score'] = totalHand($house);
+        foreach ($players as $eachPlayer){
+            //deal card -> player
+            $eachPlayer['cards'][] = dealCard($deck);
+            //deal card -> player
+            $eachPlayer['cards'][]= dealCard($deck);
+            //total player hand
+            $eachPlayer['score'] = totalHand($eachPlayer);
+            //check if hand over 16 and stop
+            shouldIKeepPlaying($eachPlayer);
 
-        while($player['score'] <= 16 and $house['score'] <= 16){
-            $player['cards'][] = dealCard($deck);
-            $house['cards'][] = dealCard($deck);
-            $player['score'] = totalHand($player);
-            $house['score'] = totalHand($house);
+            while($eachPlayer['keepPlaying']){
+                //deal a card
+                $eachPlayer['cards'][]= dealCard($deck);
+                //total player hand
+                $eachPlayer['score'] = totalHand($eachPlayer);
+                shouldIKeepPlaying($eachPlayer);
+            }
         }
-        echo andTheWinnerIs($player, $house);
+
+        echo andTheWinnerIs($players);
 //        //play again?
 //        if (playAgain()) {
 //            continue;
