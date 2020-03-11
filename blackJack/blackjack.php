@@ -37,6 +37,42 @@ function checkBust(array $aPlayer) : bool {
     return $aPlayer[2] <= 21;
 }
 
+function makeWinningMessage (array $aPlayer) : string {
+    $winningMessage = '';
+
+    foreach ($aPlayer as $anAttribute){
+        if(is_array($anAttribute)){
+            $winningMessage = $winningMessage . ' ' . $anAttribute[0] . ' of ' . $anAttribute[1] . '<br>';
+        } else {
+            $winningMessage = $winningMessage . ' ' . $anAttribute[0] . ' of ' . $anAttribute[1] . '<br>';
+        }
+    }
+
+    return $winningMessage;
+}
+
+function andTheWinnerIs(array $aPlayer, array $anotherPlayer) : string {
+    $winningMessage = 'Player 1 Has: <br>';
+
+    $winningMessage = $winningMessage . makeWinningMessage($aPlayer);
+
+    $winningMessage = $winningMessage . '<br> <br>The House has: <br>';
+
+    $winningMessage = $winningMessage . makeWinningMessage($anotherPlayer);
+
+    $winningMessage = $winningMessage . '<br><br>';
+
+    if ($aPlayer[2] > $anotherPlayer[2]) {
+        $winningMessage = $winningMessage . 'PLAYER WINS!!!!!';
+    } elseif ($aPlayer[2] == $anotherPlayer[2]) {
+        $winningMessage = $winningMessage . "IT'S A DRAW!!!!!";
+    } else {
+        $winningMessage = $winningMessage . "Sorry the house wins :-(";
+    }
+
+    return $winningMessage;
+}
+
 function playBlackjack () {
     $deck = [
         'hearts' => [2,3,4,5,6,7,8,9,10,'Jack','Queen','King','Ace'],
@@ -56,26 +92,32 @@ function playBlackjack () {
         $player[] = dealCard($deck);
         //deal card -> player
         $player[] = dealCard($deck);
+        //total player hand
+        $player[2] = totalHand($player);
+        //check if player busts
+        if(checkBust($player)){
+            andTheWinnerIs($house);
+        }
         //deal card -> house
         $house[] = dealCard($deck);
         //deal card -> house
-        $player[] = dealCard($deck);
-        //total hand -> player
-        $player[2] = totalHand($player);
+        $house[] = dealCard($deck);
         //total hand -> house
         $house[2] = totalHand($house);
-        //check if bust -> player
-        if(checkBust($player)){
-
-        }
         //check if bust -> house
-        checkBust($house);
-        //declare winner
-        andTheWinnerIs();
-        //play again?
-        if (playAgain()) {
-            continue;
+        if (checkBust($house)){
+            andTheWinnerIs($player);
         }
+        //declare winner
+        if($player[2] > $house[2]){
+            andTheWinnerIs($player);
+        } else {
+            andTheWinnerIs($house);
+        }
+//        //play again?
+//        if (playAgain()) {
+//            continue;
+//        }
     break;
     }
 }
