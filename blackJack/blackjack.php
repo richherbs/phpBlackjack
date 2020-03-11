@@ -42,13 +42,14 @@ function checkBust(array $aPlayer) : bool {
 function makeWinningMessage (array $aPlayer) : string {
     $winningMessage = '';
 
-    foreach ($aPlayer as $anAttribute){
-        if(is_array($anAttribute)){
-            $winningMessage = $winningMessage . ' ' . $anAttribute[1] . ' of ' . $anAttribute[0] . '<br>';
+    foreach ($aPlayer['cards']as $aCard){
+        if(is_array($aCard)){
+            $winningMessage = $winningMessage . ' ' . $aCard[1] . ' of ' . $aCard[0] . '<br>';
         } else {
-            $winningMessage = $winningMessage . ' ' . $anAttribute[1] . ' of ' . $anAttribute[0] . '<br>';
+            $winningMessage = $winningMessage . ' ' . $aCard[1] . ' of ' . $aCard[0] . '<br>';
         }
     }
+
 
     return $winningMessage;
 }
@@ -97,9 +98,9 @@ function playBlackjack () {
         //shuffle pack
         $deck = shufflePack($deck);
         //deal card -> player
-        $player[0] = dealCard($deck);
+        $player['cards'][] = dealCard($deck);
         //deal card -> player
-        $player[1] = dealCard($deck);
+        $player['cards'][]= dealCard($deck);
         //total player hand
         $player[2] = totalHand($player);
         //check if player busts
@@ -108,9 +109,9 @@ function playBlackjack () {
             break;
         }
         //deal card -> house
-        $house[0] = dealCard($deck);
+        $house['cards'][] = dealCard($deck);
         //deal card -> house
-        $house[1] = dealCard($deck);
+        $house['cards'][] = dealCard($deck);
         //total hand -> house
         $house[2] = totalHand($house);
 
